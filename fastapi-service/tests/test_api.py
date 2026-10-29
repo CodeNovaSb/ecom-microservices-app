@@ -74,7 +74,7 @@ class FastApiTests(unittest.TestCase):
         ]
 
         with patch("app.orders.service.httpx.Client", return_value=http_client):
-            with SessionLocal() as db:
+            with SessionLocal():
                 response = self.client.post(
                     "/api/v1/orders/",
                     json={"user_id": 1, "product_id": 1, "quantity": 2},
