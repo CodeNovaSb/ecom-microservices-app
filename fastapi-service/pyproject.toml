@@ -1,0 +1,11 @@
+[project]
+name = "fastapi-service"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "alembic>=1.20.0",
+    "fastapi[standard]>=0.145.0",
+    "httpx>=0.28.1",
+    "python-dotenv>=1.2.4",
+    "sqlalchemy>=2.1.5",
+]
