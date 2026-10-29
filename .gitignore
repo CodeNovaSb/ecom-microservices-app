@@ -1,1 +1,8 @@
 .idea
+
+**/.env
+**/.venv/
+**/db.sqlite3
+**/db.sqlite3-*
+**/fastapi.db
+**/fastapi.db-*

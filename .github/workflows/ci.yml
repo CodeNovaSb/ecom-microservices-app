@@ -1,0 +1,65 @@
+name: Lint, test, and build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+env:
+  PUSH_IMAGES: ${{ github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+  IMAGE_NAMESPACE: ${{ secrets.DOCKERHUB_USERNAME || 'local' }}
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uvx ruff check django-service fastapi-service
+
+  test-django:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: django-service
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked
+      - run: uv run python manage.py test
+
+  test-fastapi:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: fastapi-service
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked
+      - run: uv run python -m unittest discover -s tests -p 'test_*.py'
+
+  build:
+    needs: [lint, test-django, test-fastapi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        if: env.PUSH_IMAGES == 'true'
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./django-service
+          push: ${{ env.PUSH_IMAGES == 'true' }}
+          tags: ${{ env.IMAGE_NAMESPACE }}/ecom-django:latest
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./fastapi-service
+          push: ${{ env.PUSH_IMAGES == 'true' }}
+          tags: ${{ env.IMAGE_NAMESPACE }}/ecom-fastapi:latest

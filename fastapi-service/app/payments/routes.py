@@ -8,7 +8,7 @@ from app.orders.models import Order
 from app.payments.models import Payment, StatusEnum
 from app.payments.schemas import PaymentCreate
 from datetime import datetime, timezone
-from app.orders.models import Order
+
 router = APIRouter(prefix="/api/v1/payments", tags=["Payments"])
 
 @router.get("/")

@@ -1,0 +1,28 @@
+services:
+  django:
+    build:
+      context: ./django-service
+    environment:
+      DJANGO_ALLOWED_HOSTS: django,localhost,127.0.0.1
+      DJANGO_DATABASE_PATH: /data/db.sqlite3
+    ports:
+      - "8000:8000"
+    volumes:
+      - django-data:/data
+
+  fastapi:
+    build:
+      context: ./fastapi-service
+    environment:
+      DATABASE_URL: sqlite:////data/fastapi.db
+      DJANGO_BASE_URL: http://django:8000
+    ports:
+      - "8001:8000"
+    volumes:
+      - fastapi-data:/data
+    depends_on:
+      - django
+
+volumes:
+  django-data:
+  fastapi-data:

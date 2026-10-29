@@ -1,0 +1,16 @@
+line-length = 100
+target-version = "py314"
+
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "*.db",
+]
+
+[lint]
+select = ["E4", "E7", "E9", "F"]
+ignore = ["E501", "F401"]
+
+[lint.per-file-ignores]
+"fastapi-service/tests/test_api.py" = ["E402"]
